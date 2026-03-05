@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS1591;CA1707;CA1711;CA1001;CA1822</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.*" />
+    <PackageReference Include="NSubstitute" Version="5.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Messaggero.Abstractions\Messaggero.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero\Messaggero.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Transport.RabbitMQ\Messaggero.Transport.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Transport.Kafka\Messaggero.Transport.Kafka.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>RabbitMQ transport implementation for Messaggero</Description>
+    <PackageId>Messaggero.Transport.RabbitMQ</PackageId>
+    <NoWarn>$(NoWarn);CA1848;CA1873</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Messaggero.Abstractions\Messaggero.Abstractions.csproj" />
+    <ProjectReference Include="..\Messaggero\Messaggero.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="7.*" />
+  </ItemGroup>
+
+</Project>

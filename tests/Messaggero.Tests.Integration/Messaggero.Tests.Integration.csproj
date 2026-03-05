@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS1591;CA1707;CA1711</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="FluentAssertions" Version="8.*" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="4.*" />
+    <PackageReference Include="Testcontainers.Kafka" Version="4.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-preview.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Messaggero.Abstractions\Messaggero.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero\Messaggero.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Transport.RabbitMQ\Messaggero.Transport.RabbitMQ.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Transport.Kafka\Messaggero.Transport.Kafka.csproj" />
+  </ItemGroup>
+
+</Project>
