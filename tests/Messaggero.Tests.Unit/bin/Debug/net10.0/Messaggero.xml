@@ -1,0 +1,359 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Messaggero</name>
+    </assembly>
+    <members>
+        <member name="T:Messaggero.Concurrency.KeyPartitionedProcessor`1">
+            <summary>
+            Dispatches work items to fixed partitions based on a string key.
+            Messages with the same key are always processed sequentially on the same partition.
+            Messages with different keys may be processed concurrently across partitions.
+            Null keys are distributed round-robin across partitions.
+            </summary>
+            <typeparam name="TState">The type of state passed to work items (not used for partitioning).</typeparam>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Messaggero.Concurrency.KeyPartitionedProcessor`1"/> class.
+            </summary>
+            <param name="concurrencyLimit">The number of partitions (and concurrent workers).</param>
+        </member>
+        <member name="P:Messaggero.Concurrency.KeyPartitionedProcessor`1.PartitionCount">
+            <summary>
+            Gets the number of partitions.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.EnqueueAsync(System.String,System.Func{System.Threading.CancellationToken,System.Threading.Tasks.Task})">
+            <summary>
+            Enqueues a work item to the partition determined by the key.
+            </summary>
+            <param name="key">The partition key. Null keys round-robin across partitions.</param>
+            <param name="work">The async work to execute.</param>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.GetPartitionIndex(System.String)">
+            <summary>
+            Gets the partition index for a given key using MurmurHash3.
+            </summary>
+            <param name="key">The key to hash.</param>
+            <returns>The partition index (0 to PartitionCount-1).</returns>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.MurmurHash3(System.Byte[],System.UInt32)">
+            <summary>
+            MurmurHash3 32-bit implementation for deterministic, well-distributed hashing.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.StopAsync">
+            <summary>
+            Signals all partitions to complete and waits for all in-flight work to drain.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Concurrency.KeyPartitionedProcessor`1.DisposeAsync">
+            <summary>
+            Cancels all processing and disposes resources.
+            </summary>
+        </member>
+        <member name="T:Messaggero.MessageBus">
+            <summary>
+            Core message bus implementation that orchestrates serialization, transport delegation,
+            subscription management, error strategies, and per-key ordered processing.
+            </summary>
+        </member>
+        <member name="M:Messaggero.MessageBus.#ctor(Messaggero.Abstractions.IMessageBusTransport,Messaggero.Abstractions.IMessageSerializer,Microsoft.Extensions.Logging.ILogger{Messaggero.MessageBus})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Messaggero.MessageBus"/> class with a single transport (backward compatible).
+            </summary>
+            <param name="transport">The transport implementation to use.</param>
+            <param name="serializer">The message serializer.</param>
+            <param name="logger">Optional logger instance.</param>
+        </member>
+        <member name="M:Messaggero.MessageBus.#ctor(Messaggero.Routing.ITransportRouter,Messaggero.Abstractions.IMessageSerializer,Microsoft.Extensions.Logging.ILogger{Messaggero.MessageBus})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Messaggero.MessageBus"/> class with a transport router.
+            </summary>
+            <param name="router">The transport router for resolving transports.</param>
+            <param name="serializer">The message serializer.</param>
+            <param name="logger">Optional logger instance.</param>
+        </member>
+        <member name="M:Messaggero.MessageBus.PublishAsync``1(System.String,``0,Messaggero.Abstractions.MessagePublishOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.MessageBus.SubscribeAsync``1(System.String,System.String,Messaggero.Abstractions.IMessageHandler{``0},Messaggero.Abstractions.SubscriptionOptions,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.MessageBus.CheckHealthAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.MessageBus.OnLifecycleEvent(System.Action{Messaggero.Abstractions.LifecycleEvent})">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.MessageBus.DisposeAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.MessageBus.SubscriptionHandle.DrainAndDisposeAsync">
+            <summary>
+            Drains in-flight work from the processor before disposing the subscription.
+            </summary>
+        </member>
+        <member name="T:Messaggero.MessageBusBuilder">
+            <summary>
+            Builder for configuring the message bus transport, serializer, and reconnection options.
+            </summary>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.UseTransport(Messaggero.Abstractions.IMessageBusTransport)">
+            <summary>
+            Configures a transport implementation for the message bus.
+            Backward compatible: registers the transport by its Name and sets it as the default.
+            </summary>
+            <param name="transport">The transport implementation to use.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.AddTransport(Messaggero.Abstractions.IMessageBusTransport)">
+            <summary>
+            Registers a named transport. The transport's Name property is used as the key.
+            </summary>
+            <param name="transport">The transport to register.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.AddTransport(System.String,Messaggero.Abstractions.IMessageBusTransport)">
+            <summary>
+            Registers a named transport with an explicit name override.
+            </summary>
+            <param name="name">The name to register the transport under.</param>
+            <param name="transport">The transport to register.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.UseDefaultTransport(System.String)">
+            <summary>
+            Sets the default transport used when no routing rule matches.
+            </summary>
+            <param name="transportName">Name of the default transport.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.RouteDestination(System.String,System.String)">
+            <summary>
+            Adds a destination-based routing rule.
+            </summary>
+            <param name="destinationPattern">The destination glob pattern.</param>
+            <param name="transportName">The target transport name.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.RouteType``1(System.String)">
+            <summary>
+            Adds a type-based routing rule.
+            </summary>
+            <typeparam name="T">The message type to route.</typeparam>
+            <param name="transportName">The target transport name.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.RouteType(System.Type,System.String)">
+            <summary>
+            Adds a type-based routing rule.
+            </summary>
+            <param name="messageType">The message type to route.</param>
+            <param name="transportName">The target transport name.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.UseSerializer(Messaggero.Abstractions.IMessageSerializer)">
+            <summary>
+            Sets a custom message serializer. If not called, the default JSON serializer is used.
+            </summary>
+            <param name="serializer">The serializer implementation.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.WithReconnection(System.Action{Messaggero.Abstractions.ReconnectionOptions})">
+            <summary>
+            Configures reconnection behavior with exponential backoff.
+            </summary>
+            <param name="configure">An action to configure reconnection options.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.ConfigureServices(System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Registers additional services required by transport extensions.
+            </summary>
+            <param name="configure">An action to configure additional services.</param>
+            <returns>This builder for chaining.</returns>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.Validate">
+            <summary>
+            Validates the builder configuration and throws descriptive errors if required components are missing.
+            Called internally during DI registration to enable fail-fast behavior.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when transport is not configured.</exception>
+        </member>
+        <member name="M:Messaggero.MessageBusBuilder.BuildRouter">
+            <summary>
+            Builds the transport router from the current configuration.
+            </summary>
+        </member>
+        <member name="T:Messaggero.Resilience.ExponentialBackoffReconnector">
+            <summary>
+            Implements exponential backoff reconnection logic with configurable parameters.
+            Emits lifecycle events during reconnection attempts and on exhaustion.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Resilience.ExponentialBackoffReconnector.#ctor(Messaggero.Abstractions.ReconnectionOptions,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Messaggero.Resilience.ExponentialBackoffReconnector"/> class.
+            </summary>
+            <param name="options">The reconnection options defining backoff behavior.</param>
+            <param name="transportName">The name of the transport being reconnected.</param>
+        </member>
+        <member name="E:Messaggero.Resilience.ExponentialBackoffReconnector.OnEvent">
+            <summary>
+            Event raised when a lifecycle event occurs during reconnection.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Resilience.ExponentialBackoffReconnector.ReconnectAsync(System.Func{System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            Attempts to execute the connect action with exponential backoff.
+            </summary>
+            <param name="connectAction">The async action to attempt.</param>
+            <param name="cancellationToken">A token to cancel the reconnection loop.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown when max attempts are exhausted.</exception>
+        </member>
+        <member name="T:Messaggero.Routing.PatternSpecificity">
+            <summary>
+            Specificity levels for destination patterns, ordered from most to least specific.
+            </summary>
+        </member>
+        <member name="F:Messaggero.Routing.PatternSpecificity.Exact">
+            <summary>No wildcards — exact string match.</summary>
+        </member>
+        <member name="F:Messaggero.Routing.PatternSpecificity.SingleWildcard">
+            <summary>Contains single-segment wildcard (*) but not multi-segment (**).</summary>
+        </member>
+        <member name="F:Messaggero.Routing.PatternSpecificity.MultiWildcard">
+            <summary>Contains multi-segment wildcard (**).</summary>
+        </member>
+        <member name="T:Messaggero.Routing.DestinationPattern">
+            <summary>
+            A compiled glob pattern for allocation-free destination matching.
+            Segments are separated by '.'. '*' matches one segment, '**' matches one or more segments.
+            </summary>
+        </member>
+        <member name="P:Messaggero.Routing.DestinationPattern.RawPattern">
+            <summary>
+            The original pattern string (e.g., "orders.*").
+            </summary>
+        </member>
+        <member name="P:Messaggero.Routing.DestinationPattern.Specificity">
+            <summary>
+            The specificity level of this pattern.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Routing.DestinationPattern.IsMatch(System.String)">
+            <summary>
+            Tests whether the given destination matches this pattern.
+            </summary>
+        </member>
+        <member name="T:Messaggero.Routing.ITransportRouter">
+            <summary>
+            Resolves the target transport for a given destination and optional message type.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Routing.ITransportRouter.ResolveTransport(System.String,System.Type)">
+            <summary>
+            Resolves the transport to use for the given destination and optional message type.
+            </summary>
+            <param name="destination">The target destination.</param>
+            <param name="messageType">Optional CLR message type for type-based routing.</param>
+            <returns>The resolved transport.</returns>
+            <exception cref="T:System.InvalidOperationException">No matching rule and no default transport.</exception>
+        </member>
+        <member name="P:Messaggero.Routing.ITransportRouter.Transports">
+            <summary>
+            All registered transports keyed by name.
+            </summary>
+        </member>
+        <member name="T:Messaggero.Routing.RoutingRule">
+            <summary>
+            A single routing rule mapping a destination pattern or message type to a named transport.
+            Exactly one of <see cref="P:Messaggero.Routing.RoutingRule.DestinationPattern"/> or <see cref="P:Messaggero.Routing.RoutingRule.MessageType"/> must be non-null.
+            </summary>
+        </member>
+        <member name="P:Messaggero.Routing.RoutingRule.TransportName">
+            <summary>
+            Name of the target transport (must match a registered transport).
+            </summary>
+        </member>
+        <member name="P:Messaggero.Routing.RoutingRule.DestinationPattern">
+            <summary>
+            Compiled glob pattern for destination matching. Null for type-based rules.
+            </summary>
+        </member>
+        <member name="P:Messaggero.Routing.RoutingRule.MessageType">
+            <summary>
+            CLR type for type-based matching. Null for destination-based rules.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Routing.RoutingRule.ForDestination(System.String,System.String)">
+            <summary>
+            Creates a destination-based routing rule.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Routing.RoutingRule.ForType(System.String,System.Type)">
+            <summary>
+            Creates a type-based routing rule.
+            </summary>
+        </member>
+        <member name="T:Messaggero.Routing.TransportRouter">
+            <summary>
+            Routes messages to the appropriate transport based on destination patterns,
+            message type hierarchy, and default transport configuration.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Routing.TransportRouter.#ctor(System.Collections.Generic.IReadOnlyDictionary{System.String,Messaggero.Abstractions.IMessageBusTransport},System.Collections.Generic.IReadOnlyList{Messaggero.Routing.RoutingRule},System.Collections.Generic.IReadOnlyList{Messaggero.Routing.RoutingRule},System.String)">
+            <summary>
+            Creates a new router and validates all rules at startup.
+            </summary>
+            <param name="transports">Registered transports keyed by name.</param>
+            <param name="destinationRules">Destination-based routing rules.</param>
+            <param name="typeRules">Type-based routing rules.</param>
+            <param name="defaultTransportName">Optional default transport name.</param>
+            <exception cref="T:System.InvalidOperationException">Validation failure (conflicts, unregistered references).</exception>
+        </member>
+        <member name="M:Messaggero.Routing.TransportRouter.ResolveTransport(System.String,System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="T:Messaggero.Serialization.JsonMessageSerializer">
+            <summary>
+            Default JSON message serializer using System.Text.Json.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Serialization.JsonMessageSerializer.#ctor">
+            <summary>
+            Initializes a new instance with default JSON serializer options.
+            </summary>
+        </member>
+        <member name="M:Messaggero.Serialization.JsonMessageSerializer.#ctor(System.Text.Json.JsonSerializerOptions)">
+            <summary>
+            Initializes a new instance with custom JSON serializer options.
+            </summary>
+            <param name="options">The JSON serializer options to use.</param>
+        </member>
+        <member name="P:Messaggero.Serialization.JsonMessageSerializer.ContentType">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.Serialization.JsonMessageSerializer.Serialize``1(``0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Messaggero.Serialization.JsonMessageSerializer.Deserialize``1(System.ReadOnlySpan{System.Byte})">
+            <inheritdoc />
+        </member>
+        <member name="T:Messaggero.ServiceCollectionExtensions">
+            <summary>
+            Extension methods for registering the Messaggero message bus with dependency injection.
+            </summary>
+        </member>
+        <member name="M:Messaggero.ServiceCollectionExtensions.AddMessaggero(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Messaggero.MessageBusBuilder})">
+            <summary>
+            Adds the Messaggero message bus to the service collection.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="configure">An action to configure the message bus builder.</param>
+            <returns>The service collection for chaining.</returns>
+        </member>
+    </members>
+</doc>

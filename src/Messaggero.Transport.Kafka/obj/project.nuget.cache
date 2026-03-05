@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "F3WTRk/RFtY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\daniel\\source\\repos\\messaggero\\src\\Messaggero.Transport.Kafka\\Messaggero.Transport.Kafka.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\daniel\\.nuget\\packages\\confluent.kafka\\2.13.2\\confluent.kafka.2.13.2.nupkg.sha512",
+    "C:\\Users\\daniel\\.nuget\\packages\\librdkafka.redist\\2.13.2\\librdkafka.redist.2.13.2.nupkg.sha512",
+    "C:\\Users\\daniel\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.0\\microsoft.extensions.dependencyinjection.abstractions.10.0.0.nupkg.sha512",
+    "C:\\Users\\daniel\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.0\\microsoft.extensions.logging.abstractions.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
