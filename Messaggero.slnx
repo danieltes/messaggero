@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Messaggero.Abstractions/Messaggero.Abstractions.csproj" />
+    <Project Path="src/Messaggero.Transport.Kafka/Messaggero.Transport.Kafka.csproj" />
+    <Project Path="src/Messaggero.Transport.RabbitMQ/Messaggero.Transport.RabbitMQ.csproj" />
+    <Project Path="src/Messaggero/Messaggero.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Messaggero.Tests.Contract/Messaggero.Tests.Contract.csproj" />
+    <Project Path="tests/Messaggero.Tests.Integration/Messaggero.Tests.Integration.csproj" />
+    <Project Path="tests/Messaggero.Tests.Performance/Messaggero.Tests.Performance.csproj" />
+    <Project Path="tests/Messaggero.Tests.Unit/Messaggero.Tests.Unit.csproj" />
+  </Folder>
+</Solution>
