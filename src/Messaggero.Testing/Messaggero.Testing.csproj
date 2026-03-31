@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Messaggero.Testing</PackageId>
+    <RootNamespace>Messaggero.Testing</RootNamespace>
+    <AssemblyName>Messaggero.Testing</AssemblyName>
+    <Description>In-memory transport adapter and test utilities (TestMessageBus, assertion helpers) for the Messaggero messaging library.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Messaggero\Messaggero.csproj" />
+  </ItemGroup>
+
+</Project>

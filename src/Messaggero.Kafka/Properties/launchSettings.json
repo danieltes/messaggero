@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Messaggero.Kafka": {
+      "commandName": "Project"
+    },
+    "Playground.Messaggero": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\daniel\\source\\repos\\Playground\\Playground.Messaggero\\bin\\Debug\\net10.0\\Playground.Messaggero.exe",
+      "workingDirectory": "C:\\Users\\daniel\\source\\repos\\Playground\\Playground.Messaggero\\bin\\Debug\\net10.0"
+    }
+  }
+}

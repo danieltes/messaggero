@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Messaggero.RabbitMQ</PackageId>
+    <RootNamespace>Messaggero.RabbitMQ</RootNamespace>
+    <AssemblyName>Messaggero.RabbitMQ</AssemblyName>
+    <Description>RabbitMQ transport adapter for the Messaggero messaging library. Uses publisher confirms and manual ack for reliable delivery.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Messaggero\Messaggero.csproj" />
+  </ItemGroup>
+
+</Project>

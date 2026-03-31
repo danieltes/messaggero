@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Messaggero.Tests.Benchmarks</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Messaggero\Messaggero.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Testing\Messaggero.Testing.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.Kafka\Messaggero.Kafka.csproj" />
+    <ProjectReference Include="..\..\src\Messaggero.RabbitMQ\Messaggero.RabbitMQ.csproj" />
+  </ItemGroup>
+
+</Project>

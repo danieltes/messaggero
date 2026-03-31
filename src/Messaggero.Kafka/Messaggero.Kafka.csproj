@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Messaggero.Kafka</PackageId>
+    <RootNamespace>Messaggero.Kafka</RootNamespace>
+    <AssemblyName>Messaggero.Kafka</AssemblyName>
+    <Description>Apache Kafka transport adapter for the Messaggero messaging library. Provides at-least-once delivery with manual offset commit.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Messaggero\Messaggero.csproj" />
+  </ItemGroup>
+
+</Project>
