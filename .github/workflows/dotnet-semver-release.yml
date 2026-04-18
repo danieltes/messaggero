@@ -1,0 +1,230 @@
+name: .NET SemVer Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_override:
+        description: "Version bump type (auto = detect from conventional commits)"
+        required: false
+        type: choice
+        default: auto
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+
+jobs:
+  # ── Job 1: Determine version, update project files, create git tag ──────────
+  create-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      new_tag: ${{ steps.version.outputs.new_tag }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history required to read all commits and tags
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine next version
+        id: version
+        env:
+          BUMP_OVERRIDE: ${{ inputs.bump_override }}
+        run: |
+          # ── Resolve the latest SemVer tag ──────────────────────────────────
+          LATEST_TAG=$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' \
+                        --sort=-version:refname | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.0.0"
+            echo "No existing SemVer tags found. Starting from v0.0.0"
+          else
+            echo "Latest tag: $LATEST_TAG"
+          fi
+
+          # ── Guard: abort if HEAD is already tagged ─────────────────────────
+          HEAD_TAG=$(git tag --points-at HEAD --list 'v[0-9]*.[0-9]*.[0-9]*' | head -1)
+          if [ -n "$HEAD_TAG" ]; then
+            echo "::error::HEAD is already tagged as $HEAD_TAG. No new tag created."
+            exit 1
+          fi
+
+          # ── Guard: abort if there are no new commits since the last tag ────
+          COMMIT_COUNT=$(git rev-list "${LATEST_TAG}..HEAD" --count 2>/dev/null || \
+                         git rev-list HEAD --count)
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "::error::No new commits since $LATEST_TAG. Nothing to tag."
+            exit 1
+          fi
+          echo "$COMMIT_COUNT commit(s) found since $LATEST_TAG"
+
+          # ── Parse current version components ───────────────────────────────
+          VERSION="${LATEST_TAG#v}"
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          # ── Determine bump type ────────────────────────────────────────────
+          if [ "$BUMP_OVERRIDE" != "auto" ]; then
+            BUMP="$BUMP_OVERRIDE"
+            echo "Using manual override: $BUMP"
+          else
+            COMMITS=$(git log "${LATEST_TAG}..HEAD" --pretty=format:"%s%n%b" 2>/dev/null || \
+                      git log --pretty=format:"%s%n%b")
+            BUMP="patch"
+
+            while IFS= read -r line; do
+              if echo "$line" | grep -qiP '^(feat|fix|refactor|perf|docs|style|test|chore)(\(.+\))?!:|^BREAKING[- ]CHANGE'; then
+                BUMP="major"
+                break
+              fi
+              if [ "$BUMP" != "major" ] && echo "$line" | grep -qiP '^feat(\(.+\))?:'; then
+                BUMP="minor"
+              fi
+            done <<< "$COMMITS"
+
+            echo "Auto-detected bump type from conventional commits: $BUMP"
+          fi
+
+          # ── Calculate new version ──────────────────────────────────────────
+          case "$BUMP" in
+            major) NEW_MAJOR=$((MAJOR + 1)); NEW_MINOR=0;             NEW_PATCH=0             ;;
+            minor) NEW_MAJOR=$MAJOR;         NEW_MINOR=$((MINOR + 1)); NEW_PATCH=0             ;;
+            patch) NEW_MAJOR=$MAJOR;         NEW_MINOR=$MINOR;         NEW_PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
+          echo "New tag: $NEW_TAG (bump: $BUMP)"
+
+          echo "new_tag=$NEW_TAG"         >> "$GITHUB_OUTPUT"
+          echo "previous_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+          echo "bump=$BUMP"               >> "$GITHUB_OUTPUT"
+
+      - name: Update assembly version in project files
+        env:
+          NEW_TAG: ${{ steps.version.outputs.new_tag }}
+        run: |
+          VERSION="${NEW_TAG#v}"
+          ASSEMBLY_VERSION="${VERSION}.0"
+
+          # Collect files: Directory.Build.props (if present) + all *.csproj files
+          mapfile -t FILES < <(
+            find . -maxdepth 3 -name "Directory.Build.props" 2>/dev/null
+            find . -maxdepth 5 -name "*.csproj" 2>/dev/null
+          )
+
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "::warning::No .csproj or Directory.Build.props files found. Skipping version update."
+            exit 0
+          fi
+
+          for FILE in "${FILES[@]}"; do
+            echo "Patching version in $FILE"
+            sed -i "s|<Version>[^<]*</Version>|<Version>${VERSION}</Version>|g"                                          "$FILE"
+            sed -i "s|<AssemblyVersion>[^<]*</AssemblyVersion>|<AssemblyVersion>${ASSEMBLY_VERSION}</AssemblyVersion>|g" "$FILE"
+            sed -i "s|<FileVersion>[^<]*</FileVersion>|<FileVersion>${ASSEMBLY_VERSION}</FileVersion>|g"                 "$FILE"
+          done
+
+          echo "Version properties updated."
+
+      - name: Commit version bump and create tag
+        env:
+          NEW_TAG: ${{ steps.version.outputs.new_tag }}
+        run: |
+          git add $(find . -maxdepth 3 -name "Directory.Build.props") \
+                  $(find . -maxdepth 5 -name "*.csproj")
+          git commit -m "chore: bump version to ${NEW_TAG}"
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: Release ${{ steps.version.outputs.new_tag }}
+          generate_release_notes: true
+          make_latest: true
+
+  # ── Job 2: Build and pack the NuGet artifact ─────────────────────────────────
+  build-and-pack:
+    needs: create-tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      package_name: ${{ steps.pack.outputs.package_name }}
+
+    steps:
+      - name: Checkout at new tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-tag.outputs.new_tag }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'   # Change to match your project's target SDK
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Pack
+        id: pack
+        env:
+          VERSION: ${{ needs.create-tag.outputs.new_tag }}
+        run: |
+          VER="${VERSION#v}"
+          dotnet pack --configuration Release --no-build \
+            /p:Version="${VER}" \
+            --output ./nupkgs
+
+          # Capture every produced .nupkg name for the artifact summary
+          PKGS=$(ls ./nupkgs/*.nupkg | xargs -n1 basename | tr '\n' ' ')
+          echo "Produced packages: $PKGS"
+          echo "package_name=${PKGS}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload NuGet packages as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./nupkgs/*.nupkg
+          if-no-files-found: error
+
+  # ── Job 3: Exchange OIDC token for a short-lived API key, then push ──────────
+  publish-nuget:
+    needs: [create-tag, build-and-pack]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # Required: lets the job request a GitHub OIDC token
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Download NuGet packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./nupkgs
+
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+    
+      # Push the package
+      - name: NuGet push
+        run: dotnet nuget push ./nupkgs/messaggero.*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
