@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Package Metadata">
-    <Version>0.1.0</Version>
+    <Version>0.0.1</Version>
     <Authors>Daniel Eduardo Testa</Authors>
     <Description>A broker-agnostic messaging library for .NET</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
