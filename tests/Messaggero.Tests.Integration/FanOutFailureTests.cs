@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Hosting;
@@ -61,7 +61,7 @@ public class FanOutFailureTests
         var bus = new MessageBus(config, adapters, NullLogger<MessageBus>.Instance);
         var result = await bus.PublishAsync(new ImportantEvent("critical-data"));
 
-        result.Outcomes.Should().HaveCount(2);
+        Assert.Equal(2, result.Outcomes.Count);
         result.IsSuccess.Should().BeFalse();
 
         var success = result.Outcomes.Single(o => o.TransportName == "healthy");

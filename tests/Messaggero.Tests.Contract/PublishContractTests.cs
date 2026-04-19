@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Model;
 using Messaggero.Testing;
@@ -37,11 +37,11 @@ public class PublishContractTests
 
         outcome.Success.Should().BeTrue();
         outcome.TransportName.Should().Be("contract-test");
-        outcome.BrokerMetadata.Should().NotBeNull();
+        Assert.NotNull(outcome.BrokerMetadata);
         outcome.Error.Should().BeNull();
 
-        adapter.PublishedMessages.Should().ContainSingle()
-            .Which.Id.Should().Be(message.Id);
+        var published = Assert.Single(adapter.PublishedMessages);
+        published.Id.Should().Be(message.Id);
 
         await adapter.DisposeAsync();
     }
@@ -128,10 +128,10 @@ public class PublishContractTests
         };
 
         await adapter.PublishAsync(message, destination, CancellationToken.None);
-        adapter.PendingMessages.Should().ContainSingle();
+        Assert.Single(adapter.PendingMessages);
 
         await adapter.AcknowledgeAsync(received!, CancellationToken.None);
-        adapter.PendingMessages.Should().BeEmpty();
+        Assert.Empty(adapter.PendingMessages);
 
         await adapter.DisposeAsync();
     }
@@ -162,9 +162,9 @@ public class PublishContractTests
         await adapter.PublishAsync(message, destination, CancellationToken.None);
         await adapter.RejectAsync(received!, CancellationToken.None);
 
-        adapter.PendingMessages.Should().BeEmpty();
-        adapter.DeadLetterMessages.Should().ContainSingle()
-            .Which.Id.Should().Be("msg-reject");
+        Assert.Empty(adapter.PendingMessages);
+        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        deadLetter.Id.Should().Be("msg-reject");
 
         await adapter.DisposeAsync();
     }

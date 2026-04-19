@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Hosting;
@@ -136,8 +136,8 @@ public class FanInIntegrationTests
 
         await handler.WaitForMessages(2, TimeSpan.FromSeconds(5));
 
-        handler.Received.Should().HaveCount(2);
-        handler.Received.Select(r => r.SourceTransport).Should().BeEquivalentTo("kafka", "rabbitmq");
+        Assert.Equal(2, handler.Received.Count);
+        Assert.Equivalent(new[] { "kafka", "rabbitmq" }, handler.Received.Select(r => r.SourceTransport));
 
         await dispatcher.StopAsync(CancellationToken.None);
         await kafkaAdapter.DisposeAsync();

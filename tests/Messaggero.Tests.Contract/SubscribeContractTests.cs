@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Model;
 using Messaggero.Testing;
 using Xunit;

@@ -1,8 +1,9 @@
 ﻿# messaggero Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-29
+Auto-generated from all feature plans. Last updated: 2026-04-18
 
 ## Active Technologies
+- C# / .NET 10.0 (`net10.0`, `LangVersion` latest) + xunit 2.9.3, NSubstitute 5.3.0, FluentAssertions 8.3.0 → Assertivo 0.1.2, Microsoft.Extensions.* 10.0.0-preview.3 (00003-fluentassertions-to-assertivo)
 
 - C# latest (C# 13) / .NET 10 + Confluent.Kafka (Kafka adapter), RabbitMQ.Client (RabbitMQ adapter), Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options, System.Text.Json (default serializer) (00001-broker-agnostic-core)
 
@@ -22,6 +23,7 @@ tests/
 C# latest (C# 13) / .NET 10: Follow standard conventions
 
 ## Recent Changes
+- 00003-fluentassertions-to-assertivo: Added C# / .NET 10.0 (`net10.0`, `LangVersion` latest) + xunit 2.9.3, NSubstitute 5.3.0, FluentAssertions 8.3.0 → Assertivo 0.1.2, Microsoft.Extensions.* 10.0.0-preview.3
 
 - 00001-broker-agnostic-core: Added C# latest (C# 13) / .NET 10 + Confluent.Kafka (Kafka adapter), RabbitMQ.Client (RabbitMQ adapter), Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options, System.Text.Json (default serializer)
 

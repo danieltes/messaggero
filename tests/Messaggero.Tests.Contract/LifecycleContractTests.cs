@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Model;
 using Messaggero.Testing;
 using Xunit;
@@ -31,12 +31,12 @@ public class LifecycleContractTests
             await adapter.PublishAsync(message, new Destination { Name = "events" }, CancellationToken.None);
         }
 
-        adapter.PublishedMessages.Should().HaveCount(5);
+        Assert.Equal(5, adapter.PublishedMessages.Count);
 
         await adapter.StopAsync(CancellationToken.None);
 
         // After stop, published messages are preserved (no data loss)
-        adapter.PublishedMessages.Should().HaveCount(5);
+        Assert.Equal(5, adapter.PublishedMessages.Count);
     }
 
     [Fact]

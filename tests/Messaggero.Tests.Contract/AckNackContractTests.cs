@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Model;
 using Messaggero.Testing;
 using Xunit;
@@ -31,12 +31,12 @@ public class AckNackContractTests
         };
 
         await adapter.PublishAsync(message, destination, CancellationToken.None);
-        adapter.PendingMessages.Should().ContainSingle();
+        Assert.Single(adapter.PendingMessages);
 
         await adapter.AcknowledgeAsync(received!, CancellationToken.None);
 
-        adapter.PendingMessages.Should().BeEmpty();
-        adapter.DeadLetterMessages.Should().BeEmpty();
+        Assert.Empty(adapter.PendingMessages);
+        Assert.Empty(adapter.DeadLetterMessages);
 
         await adapter.DisposeAsync();
     }
@@ -67,9 +67,9 @@ public class AckNackContractTests
         await adapter.PublishAsync(message, destination, CancellationToken.None);
         await adapter.RejectAsync(received!, CancellationToken.None);
 
-        adapter.PendingMessages.Should().BeEmpty();
-        adapter.DeadLetterMessages.Should().ContainSingle()
-            .Which.Id.Should().Be("nack-1");
+        Assert.Empty(adapter.PendingMessages);
+        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        deadLetter.Id.Should().Be("nack-1");
 
         await adapter.DisposeAsync();
     }

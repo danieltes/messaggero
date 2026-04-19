@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Errors;
 using Messaggero.Routing;
 using Xunit;
@@ -29,8 +29,8 @@ public class RoutingTableTests
 
         var act = () => table.Resolve("UnknownMessage");
 
-        act.Should().Throw<NoRouteFoundException>()
-            .Which.MessageType.Should().Be("UnknownMessage");
+        var ex = Assert.Throws<NoRouteFoundException>(act);
+        ex.MessageType.Should().Be("UnknownMessage");
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class RoutingTableTests
 
         var act = () => table.Resolve("orderplaced");
 
-        act.Should().Throw<NoRouteFoundException>();
+        Assert.Throws<NoRouteFoundException>(act);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class RoutingTableTests
 
         var result = table.Resolve("OrderPlaced");
 
-        result.Transports.Should().Contain("rabbitmq");
+        Assert.Contains("rabbitmq", result.Transports);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class RoutingTableTests
         };
         var table = new RoutingTable(rules);
 
-        table.Rules.Should().HaveCount(3);
-        table.Rules.Keys.Should().BeEquivalentTo("A", "B", "C");
+        Assert.Equal(3, table.Rules.Count);
+        Assert.Equivalent(new[] { "A", "B", "C" }, table.Rules.Keys);
     }
 }
