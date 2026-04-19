@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Model;
 using Messaggero.Testing;
 using Xunit;
@@ -35,8 +35,8 @@ public class BackpressureContractTests
             await adapter.PublishAsync(message, destination, CancellationToken.None);
         }
 
-        received.Should().HaveCount(10);
-        adapter.PublishedMessages.Should().HaveCount(10);
+        Assert.Equal(10, received.Count);
+        Assert.Equal(10, adapter.PublishedMessages.Count);
 
         await adapter.DisposeAsync();
     }

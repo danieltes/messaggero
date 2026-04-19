@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Configuration;
 using Messaggero.Errors;
 using Messaggero.Hosting;

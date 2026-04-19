@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Model;
 using Xunit;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Errors;
@@ -34,8 +34,8 @@ public class ScopedHandlerValidationTests
 
         var act = () => builder.Build();
 
-        act.Should().Throw<TransportNotFoundException>()
-            .Which.TransportName.Should().Be("nonexistent");
+        var ex = Assert.Throws<TransportNotFoundException>(act);
+        ex.TransportName.Should().Be("nonexistent");
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class ScopedHandlerValidationTests
 
         var config = builder.Build();
 
-        config.Handlers.Should().ContainSingle()
-            .Which.TransportScope.Should().Be("kafka");
+        var handler = Assert.Single(config.Handlers);
+        handler.TransportScope.Should().Be("kafka");
     }
 }

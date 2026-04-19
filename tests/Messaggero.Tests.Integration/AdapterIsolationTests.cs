@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Hosting;
@@ -63,7 +63,7 @@ public class AdapterIsolationTests
         var result = await bus.PublishAsync(new OrderPlaced("ORD-1", 100m));
 
         // Fan-out: one succeeds, one fails
-        result.Outcomes.Should().HaveCount(2);
+        Assert.Equal(2, result.Outcomes.Count);
         result.IsSuccess.Should().BeFalse(); // overall is false since one failed
 
         var healthyOutcome = result.Outcomes.Single(o => o.TransportName == "healthy");
@@ -74,7 +74,7 @@ public class AdapterIsolationTests
         failingOutcome.Error.Should().NotBeNull();
 
         // Healthy adapter received the message
-        healthyAdapter.PublishedMessages.Should().ContainSingle();
+        Assert.Single(healthyAdapter.PublishedMessages);
 
         await healthyAdapter.DisposeAsync();
     }

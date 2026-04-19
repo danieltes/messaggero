@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Hosting;
@@ -153,7 +153,7 @@ public class HandlerDispatcherTests
 
         // After successful handling, message should be acknowledged (removed from pending)
         await Task.Delay(100); // Allow async ack to complete
-        adapter.PendingMessages.Should().BeEmpty();
+        Assert.Empty(adapter.PendingMessages);
 
         await dispatcher.StopAsync(CancellationToken.None);
         await adapter.DisposeAsync();
@@ -229,8 +229,8 @@ public class HandlerDispatcherTests
         // Wait for dispatch + reject
         await Task.Delay(500);
 
-        adapter.DeadLetterMessages.Should().ContainSingle()
-            .Which.Id.Should().Be("msg-fail");
+        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        deadLetter.Id.Should().Be("msg-fail");
 
         await dispatcher.StopAsync(CancellationToken.None);
         await adapter.DisposeAsync();

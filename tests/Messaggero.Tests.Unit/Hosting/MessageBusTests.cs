@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Errors;
@@ -66,7 +66,7 @@ public class MessageBusTests
 
         var result = await _bus.PublishAsync(order);
 
-        result.Outcomes.Should().HaveCount(1);
+        Assert.Single(result.Outcomes);
         result.Outcomes[0].TransportName.Should().Be("test-transport");
         result.Outcomes[0].Success.Should().BeTrue();
         result.IsSuccess.Should().BeTrue();
@@ -93,7 +93,7 @@ public class MessageBusTests
     {
         var act = () => _bus.PublishAsync("unrouted string message");
 
-        await act.Should().ThrowAsync<NoRouteFoundException>();
+        await Assert.ThrowsAsync<NoRouteFoundException>(act);
     }
 
     [Fact]

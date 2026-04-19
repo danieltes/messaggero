@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Assertivo;
 using Messaggero.Abstractions;
 using Messaggero.Configuration;
 using Messaggero.Hosting;
@@ -67,15 +67,17 @@ public class RoutingIntegrationTests
         var emailResult = await bus.PublishAsync(new EmailRequested("user@test.com"));
 
         orderResult.IsSuccess.Should().BeTrue();
-        orderResult.Outcomes.Should().ContainSingle().Which.TransportName.Should().Be("kafka");
-        kafkaAdapter.PublishedMessages.Should().ContainSingle();
+        var orderOutcome = Assert.Single(orderResult.Outcomes);
+        orderOutcome.TransportName.Should().Be("kafka");
+        Assert.Single(kafkaAdapter.PublishedMessages);
 
         emailResult.IsSuccess.Should().BeTrue();
-        emailResult.Outcomes.Should().ContainSingle().Which.TransportName.Should().Be("rabbitmq");
-        rabbitAdapter.PublishedMessages.Should().ContainSingle();
+        var emailOutcome = Assert.Single(emailResult.Outcomes);
+        emailOutcome.TransportName.Should().Be("rabbitmq");
+        Assert.Single(rabbitAdapter.PublishedMessages);
 
         // Cross-check: Kafka didn't get email, RabbitMQ didn't get order
-        kafkaAdapter.PublishedMessages.Should().AllSatisfy(m => m.Type.Should().Be("OrderPlaced"));
-        rabbitAdapter.PublishedMessages.Should().AllSatisfy(m => m.Type.Should().Be("EmailRequested"));
+        Assert.All(kafkaAdapter.PublishedMessages, m => m.Type.Should().Be("OrderPlaced"));
+        Assert.All(rabbitAdapter.PublishedMessages, m => m.Type.Should().Be("EmailRequested"));
     }
 }
