@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <PackageId>Messaggero.RabbitMQ</PackageId>
     <RootNamespace>Messaggero.RabbitMQ</RootNamespace>
     <AssemblyName>Messaggero.RabbitMQ</AssemblyName>
     <Description>RabbitMQ transport adapter for the Messaggero messaging library. Uses publisher confirms and manual ack for reliable delivery.</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

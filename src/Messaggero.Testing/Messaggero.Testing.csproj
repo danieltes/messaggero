@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+	<TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
     <PackageId>Messaggero.Testing</PackageId>
     <RootNamespace>Messaggero.Testing</RootNamespace>
     <AssemblyName>Messaggero.Testing</AssemblyName>
     <Description>In-memory transport adapter and test utilities (TestMessageBus, assertion helpers) for the Messaggero messaging library.</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
