@@ -1,20 +1,39 @@
 <Project>
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>CS1591</NoWarn>
-    <Authors>Messaggero Contributors</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/messaggero/messaggero</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/messaggero/messaggero</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>messaging;broker-agnostic;kafka;rabbitmq;dotnet</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.0</Version>
+
+  <!--
+    Shared NuGet Packaging Configuration
+    =====================================
+    This file defines repository-wide packaging defaults inherited by all projects.
+
+    HOW PACKAGING WORKS:
+    - All projects are NON-PACKABLE by default (IsPackable=false).
+    - To make a project produce a NuGet package, add <IsPackable>true</IsPackable>
+      to the project's .csproj file. That is the only required change.
+    - All metadata below (Version, Authors, Description, etc.) is inherited
+      automatically. Override any property in the project's .csproj if needed.
+
+    WHERE TO FIND THINGS:
+    - Shared metadata: This file (Directory.Build.props)
+    - Opt-in to packaging: <IsPackable>true</IsPackable> in project .csproj
+    - Per-project overrides: <PropertyGroup> in project .csproj
+    - Packaging guide: specs/00002-nuget-packaging/quickstart.md
+
+    CURRENTLY PACKABLE PROJECTS:
+    - src/Messaggero (IsPackable=true in Messaggero.csproj)
+  -->
+
+  <PropertyGroup Label="Packaging Defaults">
+    <!-- Global default: no project produces a NuGet package unless it explicitly opts in -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <PropertyGroup Label="Package Metadata">
+    <Version>0.1.0</Version>
+    <Authors>Daniel Eduardo Testa</Authors>
+    <Description>A broker-agnostic messaging library for .NET</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/danieltes/messaggero</RepositoryUrl>
+    <PackageTags>messaging broker-agnostic kafka rabbitmq dotnet</PackageTags>
+  </PropertyGroup>
+
 </Project>

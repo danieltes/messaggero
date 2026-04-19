@@ -5,6 +5,7 @@
     <RootNamespace>Messaggero.Kafka</RootNamespace>
     <AssemblyName>Messaggero.Kafka</AssemblyName>
     <Description>Apache Kafka transport adapter for the Messaggero messaging library. Provides at-least-once delivery with manual offset commit.</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

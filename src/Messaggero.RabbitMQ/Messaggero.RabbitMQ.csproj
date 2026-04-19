@@ -5,6 +5,7 @@
     <RootNamespace>Messaggero.RabbitMQ</RootNamespace>
     <AssemblyName>Messaggero.RabbitMQ</AssemblyName>
     <Description>RabbitMQ transport adapter for the Messaggero messaging library. Uses publisher confirms and manual ack for reliable delivery.</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

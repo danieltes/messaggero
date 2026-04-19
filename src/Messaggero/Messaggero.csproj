@@ -5,6 +5,7 @@
     <RootNamespace>Messaggero</RootNamespace>
     <AssemblyName>Messaggero</AssemblyName>
     <Description>Broker-agnostic messaging library for .NET with multi-transport routing, fan-out/fan-in delivery, retry policies, and OpenTelemetry observability.</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
