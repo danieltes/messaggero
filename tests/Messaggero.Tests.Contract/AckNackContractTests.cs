@@ -31,12 +31,12 @@ public class AckNackContractTests
         };
 
         await adapter.PublishAsync(message, destination, CancellationToken.None);
-        Assert.Single(adapter.PendingMessages);
+        adapter.PendingMessages.Should().ContainSingle();
 
         await adapter.AcknowledgeAsync(received!, CancellationToken.None);
 
-        Assert.Empty(adapter.PendingMessages);
-        Assert.Empty(adapter.DeadLetterMessages);
+        adapter.PendingMessages.Should().BeEmpty();
+        adapter.DeadLetterMessages.Should().BeEmpty();
 
         await adapter.DisposeAsync();
     }
@@ -67,8 +67,8 @@ public class AckNackContractTests
         await adapter.PublishAsync(message, destination, CancellationToken.None);
         await adapter.RejectAsync(received!, CancellationToken.None);
 
-        Assert.Empty(adapter.PendingMessages);
-        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        adapter.PendingMessages.Should().BeEmpty();
+        var deadLetter = adapter.DeadLetterMessages.Should().ContainSingle().Which;
         deadLetter.Id.Should().Be("nack-1");
 
         await adapter.DisposeAsync();

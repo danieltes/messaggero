@@ -63,7 +63,7 @@ public class AdapterIsolationTests
         var result = await bus.PublishAsync(new OrderPlaced("ORD-1", 100m));
 
         // Fan-out: one succeeds, one fails
-        Assert.Equal(2, result.Outcomes.Count);
+        result.Outcomes.Count.Should().Be(2);
         result.IsSuccess.Should().BeFalse(); // overall is false since one failed
 
         var healthyOutcome = result.Outcomes.Single(o => o.TransportName == "healthy");
@@ -74,7 +74,7 @@ public class AdapterIsolationTests
         failingOutcome.Error.Should().NotBeNull();
 
         // Healthy adapter received the message
-        Assert.Single(healthyAdapter.PublishedMessages);
+        healthyAdapter.PublishedMessages.Should().ContainSingle();
 
         await healthyAdapter.DisposeAsync();
     }

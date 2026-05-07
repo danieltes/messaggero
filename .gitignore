@@ -426,3 +426,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Universal editor and OS files
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

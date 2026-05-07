@@ -61,7 +61,7 @@ public class FanOutFailureTests
         var bus = new MessageBus(config, adapters, NullLogger<MessageBus>.Instance);
         var result = await bus.PublishAsync(new ImportantEvent("critical-data"));
 
-        Assert.Equal(2, result.Outcomes.Count);
+        result.Outcomes.Count.Should().Be(2);
         result.IsSuccess.Should().BeFalse();
 
         var success = result.Outcomes.Single(o => o.TransportName == "healthy");
