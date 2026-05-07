@@ -29,7 +29,7 @@ public class RoutingTableTests
 
         var act = () => table.Resolve("UnknownMessage");
 
-        var ex = Assert.Throws<NoRouteFoundException>(act);
+    var ex = act.Should().Throw<NoRouteFoundException>().Which;
         ex.MessageType.Should().Be("UnknownMessage");
     }
 
@@ -64,7 +64,7 @@ public class RoutingTableTests
 
         var act = () => table.Resolve("orderplaced");
 
-        Assert.Throws<NoRouteFoundException>(act);
+    act.Should().Throw<NoRouteFoundException>();
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class RoutingTableTests
 
         var result = table.Resolve("OrderPlaced");
 
-        Assert.Contains("rabbitmq", result.Transports);
+    result.Transports.Should().Contain("rabbitmq");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class RoutingTableTests
         };
         var table = new RoutingTable(rules);
 
-        Assert.Equal(3, table.Rules.Count);
-        Assert.Equivalent(new[] { "A", "B", "C" }, table.Rules.Keys);
+        table.Rules.Count.Should().Be(3);
+        table.Rules.Keys.Should().BeEquivalentTo(new[] { "A", "B", "C" });
     }
 }

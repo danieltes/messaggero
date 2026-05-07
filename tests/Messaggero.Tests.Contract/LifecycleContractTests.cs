@@ -31,12 +31,12 @@ public class LifecycleContractTests
             await adapter.PublishAsync(message, new Destination { Name = "events" }, CancellationToken.None);
         }
 
-        Assert.Equal(5, adapter.PublishedMessages.Count);
+        adapter.PublishedMessages.Count.Should().Be(5);
 
         await adapter.StopAsync(CancellationToken.None);
 
         // After stop, published messages are preserved (no data loss)
-        Assert.Equal(5, adapter.PublishedMessages.Count);
+        adapter.PublishedMessages.Count.Should().Be(5);
     }
 
     [Fact]

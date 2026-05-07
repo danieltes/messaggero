@@ -35,8 +35,8 @@ public class BackpressureContractTests
             await adapter.PublishAsync(message, destination, CancellationToken.None);
         }
 
-        Assert.Equal(10, received.Count);
-        Assert.Equal(10, adapter.PublishedMessages.Count);
+        received.Count.Should().Be(10);
+        adapter.PublishedMessages.Count.Should().Be(10);
 
         await adapter.DisposeAsync();
     }

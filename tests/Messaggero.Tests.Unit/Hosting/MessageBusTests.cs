@@ -66,7 +66,7 @@ public class MessageBusTests
 
         var result = await _bus.PublishAsync(order);
 
-        Assert.Single(result.Outcomes);
+        result.Outcomes.Should().ContainSingle();
         result.Outcomes[0].TransportName.Should().Be("test-transport");
         result.Outcomes[0].Success.Should().BeTrue();
         result.IsSuccess.Should().BeTrue();
@@ -91,9 +91,9 @@ public class MessageBusTests
     [Fact]
     public async Task PublishAsync_NoRoutingRule_ThrowsNoRouteFoundException()
     {
-        var act = () => _bus.PublishAsync("unrouted string message");
+        Func<Task> act = async () => await _bus.PublishAsync("unrouted string message");
 
-        await Assert.ThrowsAsync<NoRouteFoundException>(act);
+        await act.Should().ThrowAsync<NoRouteFoundException>();
     }
 
     [Fact]

@@ -153,7 +153,7 @@ public class HandlerDispatcherTests
 
         // After successful handling, message should be acknowledged (removed from pending)
         await Task.Delay(100); // Allow async ack to complete
-        Assert.Empty(adapter.PendingMessages);
+        adapter.PendingMessages.Should().BeEmpty();
 
         await dispatcher.StopAsync(CancellationToken.None);
         await adapter.DisposeAsync();
@@ -229,7 +229,7 @@ public class HandlerDispatcherTests
         // Wait for dispatch + reject
         await Task.Delay(500);
 
-        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        var deadLetter = adapter.DeadLetterMessages.Should().ContainSingle().Which;
         deadLetter.Id.Should().Be("msg-fail");
 
         await dispatcher.StopAsync(CancellationToken.None);

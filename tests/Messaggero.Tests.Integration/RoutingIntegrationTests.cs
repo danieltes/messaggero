@@ -67,14 +67,14 @@ public class RoutingIntegrationTests
         var emailResult = await bus.PublishAsync(new EmailRequested("user@test.com"));
 
         orderResult.IsSuccess.Should().BeTrue();
-        var orderOutcome = Assert.Single(orderResult.Outcomes);
+        var orderOutcome = orderResult.Outcomes.Should().ContainSingle().Which;
         orderOutcome.TransportName.Should().Be("kafka");
-        Assert.Single(kafkaAdapter.PublishedMessages);
+        kafkaAdapter.PublishedMessages.Should().ContainSingle();
 
         emailResult.IsSuccess.Should().BeTrue();
-        var emailOutcome = Assert.Single(emailResult.Outcomes);
+        var emailOutcome = emailResult.Outcomes.Should().ContainSingle().Which;
         emailOutcome.TransportName.Should().Be("rabbitmq");
-        Assert.Single(rabbitAdapter.PublishedMessages);
+        rabbitAdapter.PublishedMessages.Should().ContainSingle();
 
         // Cross-check: Kafka didn't get email, RabbitMQ didn't get order
         Assert.All(kafkaAdapter.PublishedMessages, m => m.Type.Should().Be("OrderPlaced"));

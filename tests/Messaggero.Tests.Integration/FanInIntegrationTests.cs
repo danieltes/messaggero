@@ -136,8 +136,8 @@ public class FanInIntegrationTests
 
         await handler.WaitForMessages(2, TimeSpan.FromSeconds(5));
 
-        Assert.Equal(2, handler.Received.Count);
-        Assert.Equivalent(new[] { "kafka", "rabbitmq" }, handler.Received.Select(r => r.SourceTransport));
+    handler.Received.Count.Should().Be(2);
+    handler.Received.Select(r => r.SourceTransport).Should().BeEquivalentTo(new[] { "kafka", "rabbitmq" });
 
         await dispatcher.StopAsync(CancellationToken.None);
         await kafkaAdapter.DisposeAsync();

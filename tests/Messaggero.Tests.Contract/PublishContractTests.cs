@@ -37,10 +37,10 @@ public class PublishContractTests
 
         outcome.Success.Should().BeTrue();
         outcome.TransportName.Should().Be("contract-test");
-        Assert.NotNull(outcome.BrokerMetadata);
+    outcome.BrokerMetadata.Should().NotBeNull();
         outcome.Error.Should().BeNull();
 
-        var published = Assert.Single(adapter.PublishedMessages);
+    var published = adapter.PublishedMessages.Should().ContainSingle().Which;
         published.Id.Should().Be(message.Id);
 
         await adapter.DisposeAsync();
@@ -128,10 +128,10 @@ public class PublishContractTests
         };
 
         await adapter.PublishAsync(message, destination, CancellationToken.None);
-        Assert.Single(adapter.PendingMessages);
+    adapter.PendingMessages.Should().ContainSingle();
 
         await adapter.AcknowledgeAsync(received!, CancellationToken.None);
-        Assert.Empty(adapter.PendingMessages);
+    adapter.PendingMessages.Should().BeEmpty();
 
         await adapter.DisposeAsync();
     }
@@ -162,8 +162,8 @@ public class PublishContractTests
         await adapter.PublishAsync(message, destination, CancellationToken.None);
         await adapter.RejectAsync(received!, CancellationToken.None);
 
-        Assert.Empty(adapter.PendingMessages);
-        var deadLetter = Assert.Single(adapter.DeadLetterMessages);
+        adapter.PendingMessages.Should().BeEmpty();
+        var deadLetter = adapter.DeadLetterMessages.Should().ContainSingle().Which;
         deadLetter.Id.Should().Be("msg-reject");
 
         await adapter.DisposeAsync();

@@ -34,7 +34,7 @@ public class ScopedHandlerValidationTests
 
         var act = () => builder.Build();
 
-        var ex = Assert.Throws<TransportNotFoundException>(act);
+    var ex = act.Should().Throw<TransportNotFoundException>().Which;
         ex.TransportName.Should().Be("nonexistent");
     }
 
@@ -51,7 +51,7 @@ public class ScopedHandlerValidationTests
 
         var config = builder.Build();
 
-        var handler = Assert.Single(config.Handlers);
+        var handler = config.Handlers.Should().ContainSingle().Which;
         handler.TransportScope.Should().Be("kafka");
     }
 }
