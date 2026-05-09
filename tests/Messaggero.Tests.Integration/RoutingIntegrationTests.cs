@@ -77,7 +77,7 @@ public class RoutingIntegrationTests
         rabbitAdapter.PublishedMessages.Should().ContainSingle();
 
         // Cross-check: Kafka didn't get email, RabbitMQ didn't get order
-        Assert.All(kafkaAdapter.PublishedMessages, m => m.Type.Should().Be("OrderPlaced"));
-        Assert.All(rabbitAdapter.PublishedMessages, m => m.Type.Should().Be("EmailRequested"));
+        kafkaAdapter.PublishedMessages.Should().AllSatisfy(m => m.Type.Should().Be("OrderPlaced"));
+        rabbitAdapter.PublishedMessages.Should().AllSatisfy(m => m.Type.Should().Be("EmailRequested"));
     }
 }
